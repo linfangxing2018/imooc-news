@@ -1,0 +1,1 @@
+<view class="scroll"><scroll-view class="list-scroll" scroll-y="{{true}}"><view><list-card vue-id="01f3d688-1" mode="base" list="{{list}}" bind:__l="__l"></list-card></view></scroll-view></view>
