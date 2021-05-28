@@ -73,6 +73,9 @@
 			return {
 				
 			};
+		},
+		mounted() {
+			console.log(this.list,'list')
 		}
 	}
 </script>
