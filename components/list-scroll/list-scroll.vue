@@ -1,6 +1,6 @@
 <template>
 	<view class="scroll">
-		<scroll-view scroll-y class="list-scroll">
+		<scroll-view scroll-y class="list-scroll" @scrolltolower="loadMore">
 			<view>
 				<slot></slot>
 			</view>
@@ -22,7 +22,10 @@
 			
 		},
 		methods: {
-			
+			// 触发下拉事件
+			loadMore() {
+				this.$emit('load')
+			}
 		}
 	}
 </script>

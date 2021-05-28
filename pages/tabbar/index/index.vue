@@ -12,9 +12,11 @@
 				 v-for="(item, index) in tabList.length"
 				 :key="index"
 				>
-					<list-scroll>
+					<list-scroll @load='load'>
 						<list-card :list="listCacheData[index]"></list-card>
+						<uni-load-more  v-if="listCacheData[index].length === 0 || listCacheData[index].length > 7" :status="loadPage[index].load"></uni-load-more>
 					</list-scroll>
+					
 				</swiper-item>
 			</swiper>
 		</view>
@@ -31,8 +33,10 @@
 				swiperHeight: '',
 				checkIndex: 0,   // tab索引
 				current: 0,     // swiper-item当前页
-				//list: [], // 列表数据
 				listCacheData: {},   // 缓存列表数据
+				loadPage: {},       // 切换标签从第一页开始请求
+				pageSize: 10,
+				// loadStatus: 'loading',  // 加载更多初始状态
 			}
 		},
 		// 页面使用onLoad，组件使用created
@@ -42,7 +46,7 @@
 			this.getElementHeight('.swiper-item')
 			
 			// 有时候在这里拿不到tablist中的值。我们通过监听tablist变化就行
-			//this.getList(0)   // swiper列表数据, 默认首页展示后端开发的数据
+			// this.getList(0)   // swiper列表数据, 默认首页展示后端开发的数据
 		},
 		watch: {
 			tabList(newVal) {
@@ -57,22 +61,45 @@
 				this.$api.get_label().then((res) => {
 					console.log(res,'res')
 					this.tabList = res.data
+					// 在数组头部添加一个全部字段
+					this.tabList.unshift({
+						name: '全部'
+					})
 				})
 			},
 			
 			getList(current) {
+				if (!this.loadPage[current]) {
+					this.loadPage[current] = {
+						page: 1,
+						load: 'loading',
+					}
+				}
 				this.$api.get_list({
-					name: this.tabList[current].name
+					name: this.tabList[current].name,
+					page: this.loadPage[current].page,
+					pageSize: this.pageSize
 					}).then((res) => {
 						const {
 							data
 						} = res
-					// this.list = res.data
 					// vue中直接改变对象或者数组不生效，使用$set修改或者assgin,第二个参数为索引
-						//数据懒加载
-					this.$set(this.listCacheData, current, data)
-				
+					//数据懒加载
 					
+					if (data.length == 0) {
+						let oldLoad = {}
+						oldLoad.load = 'nomore'
+						oldLoad.page = this.loadPage[current].page
+						this.$set(this.loadPage, current, oldLoad)
+						// 强制渲染页面
+						this.$forceUpdate()
+						return
+					}
+					
+				
+				    let oldData = this.listCacheData[current] || [] // 保存上一页的数据
+					oldData.push(...data)
+					this.$set(this.listCacheData, current, oldData)
 					console.log(this.listCacheData,'get_list')
 				})
 			},
@@ -91,6 +118,7 @@
 				},20)
 			},
 			changeSwiper(e) {
+				this.page = 1
 				const {
 					current
 				} = e.detail    // 获取索引
@@ -102,11 +130,17 @@
 				if (!this.listCacheData[current] || this.listCacheData.length == 0) {
 					this.getList(current)
 				}
-				
 				console.log(current,'dfasd')
 			},
 			change(index) {
 				this.current = index
+			},
+			// 加载更多数据
+			load() {
+				console.log('触发下拉')
+				if (this.loadPage[this.current].load === 'nomore') return
+				this.loadPage[this.current].page++
+				this.getList(this.current)
 			}
 		}
 	}

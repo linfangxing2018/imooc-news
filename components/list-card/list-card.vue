@@ -3,24 +3,30 @@
 		<view v-for="item in list" :key="item.id">
 			<!-- 基础卡片 -->
 			<view class="list-base common" v-if="item.mode === 'base'">
-				<view class="list-top">
+				<view class="list-top list-icon">
 					<view class="item-image">
 						<image  :src="item.cover" mode="scaleToFill"></image>
 					</view>
 					<view class="text">
 						<text>{{item.title}}</text>
 					</view>
+					<view class="icon">
+						<uni-icons color="red" @click.stop="onlikes" :type="likes ? 'heartfilled' : 'heart'"></uni-icons>
+					</view>
 				</view>
-				<view class="list-bottom">
+				<view class="list-bottom list-icon">
 					<view class="bottom-web">{{item.classify}}</view>
 					<view class="bottom-view">{{item.browse_count}}浏览</view>
 				</view>
 			</view>
 			<!-- 多图模式 -->
 			<view class="list-more common" v-if="item.mode === 'column'">
-				<view class="list-top">
+				<view class="list-top list-icon">
 					<view class="text">
 						<text>{{item.title}}</text> 
+					</view>
+					<view class="icon">
+						<uni-icons color="red" type="heart"></uni-icons>
 					</view>
 			
 					<view class="item-image" >
@@ -32,6 +38,7 @@
 					<view class="bottom-view">{{item.browse_count}}浏览</view>
 				</view>
 			</view>
+			
 			<!-- 大图模式 -->
 			<view class="list-big common" v-if="item.mode === 'image'">
 				<view class="list-top">
@@ -41,6 +48,9 @@
 					</view>
 					<view class="text">
 						<text>{{item.title}}</text> 
+					</view>
+					<view class="icon">
+						<uni-icons color="red" type="heart"></uni-icons>
 					</view>
 					
 					
@@ -71,11 +81,16 @@
 		},
 		data() {
 			return {
-				
+				likes: false,
 			};
 		},
 		mounted() {
 			console.log(this.list,'list')
+		},
+		methods: {
+			onlikes() {
+				this.likes = !this.likes
+			}
 		}
 	}
 </script>
@@ -90,16 +105,27 @@
 	box-shadow: 0 0 5px 1px rgba($color: #000000, $alpha: 0.1);
 	
 }
+.list-icon {
+	position: relative;
+	padding-right: 15px;
+	.icon {
+		position: absolute;
+		top: 0;
+		right: 0;
+	}
+}
 .list-base {
 	.list-top {
 		display: flex;
 		flex-wrap: nowrap;
+		
 		.item-image image {
 			width: 70px;
 			height: 70px;
 		}
 		.text {	
 		}
+		
 		
 	}
 	.list-bottom {

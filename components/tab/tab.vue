@@ -7,7 +7,7 @@
 				<view v-for="(item, index) in list" 
 				 class="tab-scroll-box_item"
 				 :class="{active: listIndex === index}"
-				 :key="item._id"
+				 :key="index"
 				 @click="checkTab(item, index)">{{item.name}}</view>
 			</view>
 		</scroll-view>
